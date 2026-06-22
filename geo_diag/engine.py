@@ -708,6 +708,10 @@ def main():
     parser.add_argument("--site-desc", help="Site description (required for --fix)")
     parser.add_argument("--image-url", help="OG image URL (optional for --fix)")
     parser.add_argument("--twitter", help="Twitter handle (optional for --fix)")
+    parser.add_argument("--campaign", action="store_true", help="Generate campaign content from audit")
+    parser.add_argument("--campaign-dir", default="./geo-campaign", help="Directory for campaign files")
+    parser.add_argument("--tagline", help="Product tagline (optional for --campaign)")
+    parser.add_argument("--audience", default="SEO从业者、内容创作者、技术团队", help="Target audience")
 
     args = parser.parse_args()
 
@@ -813,6 +817,48 @@ def main():
             indicator = "📈" if diff > 0 else "📉" if diff < 0 else "➡️"
             if diff != 0:
                 print(f"  {indicator} {name:25s} {before} → {after} ({diff:+d})")
+
+    # Campaign mode: generate marketing content
+    if args.campaign:
+        from geo_diag.campaign import generate_campaign_from_audit, save_campaign
+
+        if not args.site_name:
+            print("\n❌ --site-name is required for --campaign mode")
+            sys.exit(1)
+
+        parsed = urlparse(args.url)
+        base_url = f"{parsed.scheme}://{parsed.netloc}"
+
+        print(f"\n{'='*60}")
+        print("📢 Generating campaign content...")
+        print(f"{'='*60}")
+
+        campaign = generate_campaign_from_audit(
+            audit_result=result,
+            site_name=args.site_name,
+            site_url=base_url,
+            product_tagline=args.tagline or "",
+            target_audience=args.audience,
+        )
+
+        saved = save_campaign(campaign, args.campaign_dir)
+        print(f"\n✅ Generated {len(saved)} campaign files:")
+        for f in saved:
+            print(f"   📄 {f}")
+
+        print(f"\n{'─'*60}")
+        print("Campaign Summary:")
+        print(f"{'─'*60}")
+        print(f"  📝 Title: {campaign.title}")
+        print(f"  📋 Summary: {campaign.summary}")
+        print(f"\n💡 Content ready for:")
+        print(f"   • 飞书社群 — feishu-post.md")
+        print(f"   • 技术博客 — blog-article.md")
+        print(f"   • Twitter — social-twitter.txt")
+        print(f"   • 小红书 — social-xiaohongshu.txt")
+        print(f"   • 微信公众号 — social-wechat.txt")
+        print(f"   • 知乎 — social-zhihu.txt")
+        print(f"   • 落地页 — landing-page.html")
 
 
 if __name__ == "__main__":
