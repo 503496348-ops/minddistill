@@ -326,7 +326,7 @@ def _audit_content_citability(html: str) -> DimensionScore:
         ds.score = 10
         return ds
 
-    # Score based on citability criteria (AI搜索优化研究)
+    # Score based on citability criteria (Princeton KDD 2024)
     citable_count = 0
     for para in paragraphs:
         words = para.split()
@@ -690,12 +690,24 @@ def format_report_text(result: GeoAuditResult) -> str:
 
 def main():
     import argparse
+    import sys
+    from pathlib import Path
+
+    # Add parent directory to path for imports
+    sys.path.insert(0, str(Path(__file__).parent.parent))
 
     parser = argparse.ArgumentParser(description="GEO Diagnostic Report — Audit website AI search readiness")
     parser.add_argument("url", help="URL to audit")
     parser.add_argument("-o", "--output", help="Output file (text or JSON)")
     parser.add_argument("--json", action="store_true", help="Output as JSON")
     parser.add_argument("--timeout", type=int, default=15, help="HTTP timeout in seconds")
+    parser.add_argument("--fix", action="store_true", help="Generate fix files for low-scoring dimensions")
+    parser.add_argument("--fix-dir", default="./geo-fixes", help="Directory for generated fix files")
+    parser.add_argument("--verify", action="store_true", help="Re-audit after fixes to show improvement")
+    parser.add_argument("--site-name", help="Site name (required for --fix)")
+    parser.add_argument("--site-desc", help="Site description (required for --fix)")
+    parser.add_argument("--image-url", help="OG image URL (optional for --fix)")
+    parser.add_argument("--twitter", help="Twitter handle (optional for --fix)")
 
     args = parser.parse_args()
 
@@ -712,6 +724,95 @@ def main():
     if args.output:
         Path(args.output).write_text(output, encoding="utf-8")
         print(f"\n📄 Report saved to {args.output}")
+
+    # Generate fixes if requested
+    if args.fix:
+        from geo_diag.fixer import generate_fixes_from_audit
+
+        if not args.site_name:
+            print("\n❌ --site-name is required for --fix mode")
+            sys.exit(1)
+        if not args.site_desc:
+            print("\n❌ --site-desc is required for --fix mode")
+            sys.exit(1)
+
+        from urllib.parse import urlparse
+        parsed = urlparse(args.url)
+        base_url = f"{parsed.scheme}://{parsed.netloc}"
+
+        print(f"\n🔧 Generating fixes for low-scoring dimensions...")
+        fixes = generate_fixes_from_audit(
+            audit_result=result,
+            site_name=args.site_name,
+            site_url=base_url,
+            description=args.site_desc,
+            image_url=args.image_url,
+            twitter_handle=args.twitter,
+        )
+
+        saved = fixes.save_all(args.fix_dir)
+        if saved:
+            print(f"✅ Generated {len(saved)} fix files:")
+            for f in saved:
+                print(f"   📄 {f}")
+
+            # Show fix summary
+            print(f"\n{'─'*60}")
+            print("Fix Summary:")
+            print(f"{'─'*60}")
+            if fixes.robots_txt:
+                print("  • robots.txt — AI crawler rules")
+            if fixes.llms_txt:
+                print("  • llms.txt — AI site description")
+            if fixes.jsonld_schema:
+                print("  • schema.jsonld — Structured data (Organization + WebPage)")
+            if fixes.meta_tags:
+                print("  • meta-tags.html — OG/Twitter meta tags")
+            if fixes.html_snippet:
+                print("  • head-snippet.html — Complete <head> snippet (copy-paste ready)")
+
+            print(f"\n💡 Next steps:")
+            print(f"   1. Review generated files in {args.fix_dir}/")
+            print(f"   2. Upload robots.txt and llms.txt to your site root")
+            print(f"   3. Add head-snippet.html content to your <head> section")
+            print(f"   4. Run with --verify to check improvement")
+
+        else:
+            print("✅ No fixes needed — all dimensions scored above threshold!")
+
+    # Verify mode: re-audit to show improvement
+    if args.verify and args.fix:
+        print(f"\n{'='*60}")
+        print("🔄 Verifying improvements...")
+        print(f"{'='*60}")
+
+        result_after = run_geo_audit(args.url, args.timeout)
+        print(f"\nBefore: {result.overall_score}/100 [{result.score_band}]")
+        print(f"After:  {result_after.overall_score}/100 [{result_after.score_band}]")
+
+        delta = result_after.overall_score - result.overall_score
+        if delta > 0:
+            print(f"📈 Improvement: +{delta} points")
+        elif delta == 0:
+            print(f"➡️  No change (fixes need to be deployed first)")
+        else:
+            print(f"📉 Regression: {delta} points")
+
+        # Show per-dimension changes
+        print(f"\n{'─'*60}")
+        print("Dimension Changes:")
+        print(f"{'─'*60}")
+
+        before_dims = {d.name: d.score for d in result.dimensions}
+        after_dims = {d.name: d.score for d in result_after.dimensions}
+
+        for name in before_dims:
+            before = before_dims.get(name, 0)
+            after = after_dims.get(name, 0)
+            diff = after - before
+            indicator = "📈" if diff > 0 else "📉" if diff < 0 else "➡️"
+            if diff != 0:
+                print(f"  {indicator} {name:25s} {before} → {after} ({diff:+d})")
 
 
 if __name__ == "__main__":
