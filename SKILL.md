@@ -215,6 +215,18 @@ https://github.com/503496348-ops/minddistill
 `--verify`重新审计同一URL，如果修复文件尚未部署，分数不会变化。
 正确流程：生成修复 → 部署到网站 → 再运行验证。
 
+
+## 2026-07-15 融合增强（Wave-2/延续）
+
+- 新增 `scripts/transformers_bridge.py`：`huggingface/transformers` 兼容层。
+  - 提供 `inspect/token_count` 两种轻量模式
+  - 支持样本/文本输入与离线可复现摘要
+- `scripts/doctor.py`：新增 `transformers bridge smoke` 检查，执行 `python3 scripts/transformers_bridge.py --mode inspect --sample --compact`。
+- `scripts/minddistill_api.py`：新增 `/diag/transformers`，用于外部系统读取 `huggingface/transformers` 映射诊断结果。
+- `scripts/minddistill_api.py` 与 `tests/test_transformers_bridge.py` 纳入 `product_convergence` 外部参考白名单。
+- `package.json`：新增 `transformers:bridge` 命令。
+- `product_convergence.json`：新增 `scripts/transformers_bridge.py` smoke target 与可审计引用登记。
+
 ## 2026-07-03 产品收敛门禁
 
 - 新增 `scripts/product_convergence_gate.py`：从远端干净 clone 后可运行 `python3 scripts/product_convergence_gate.py --json`，检查 SKILL/README、入口文件、smoke 目标、测试与外部融合引用是否自洽。

@@ -58,6 +58,34 @@ def create_app():
     def diag_latest(limit: int = 10):
         return latest_runs(limit=limit)
 
+
+    @app.get('/diag/transformers')
+    def diag_transformers(compact: bool = False):
+        cmd = [
+            sys.executable,
+            str(ROOT / 'scripts' / 'transformers_bridge.py'),
+            '--mode',
+            'inspect',
+            '--sample',
+        ]
+        if compact:
+            cmd.append('--compact')
+
+        cp = subprocess.run(
+            cmd,
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+        out = cp.stdout.strip() or cp.stderr
+        payload = {'status': 'ok' if cp.returncode == 0 else 'degraded', 'command': 'transformers_bridge.py --sample --compact', 'output': out[:2000]}
+        if cp.returncode == 0:
+            try:
+                payload['bridge_result'] = json.loads(cp.stdout)
+            except Exception:
+                pass
+        return payload
+
     @app.post('/diag/run')
     def diag_run():
         passed, checks = _run_doctor()

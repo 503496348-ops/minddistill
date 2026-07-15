@@ -8,6 +8,7 @@
     "smoke": "python3 scripts/smoke.py",
     "check:syntax": "python3 -m py_compile scripts/*.py",
     "test": "python3 -m pytest tests/test_one_click_open_box.py -q",
+    "transformers:bridge": "python3 scripts/transformers_bridge.py --sample --compact",
     "api": "python3 scripts/minddistill_api.py"
   },
   "dependencies": {

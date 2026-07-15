@@ -36,6 +36,33 @@ def collect_run_report(root: Path | None = None) -> dict:
     else:
         print('[INFO] package.json absent; shell/python one-click path is primary')
 
+    bridge_script = root / 'scripts' / 'transformers_bridge.py'
+    if bridge_script.exists():
+        try:
+            cp = subprocess.run(
+                [
+                    sys.executable,
+                    str(bridge_script),
+                    '--mode',
+                    'inspect',
+                    '--sample',
+                    '--compact',
+                ],
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+            payload = json.loads(cp.stdout)
+            add('transformers bridge smoke', bool(payload.get('status') in {'ok', 'degraded'}) and bool(payload.get('repo') == 'huggingface/transformers'))
+        except Exception:
+            add(
+                'transformers bridge smoke',
+                False,
+                '运行 python scripts/transformers_bridge.py --mode inspect --sample --compact',
+            )
+    else:
+        add('transformers bridge script', False, '缺 scripts/transformers_bridge.py')
+
     gate = root / 'scripts' / 'product_convergence_gate.py'
     if gate.exists():
         try:

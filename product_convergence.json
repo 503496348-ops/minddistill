@@ -3,10 +3,16 @@
   "entrypoints": [],
   "smoke_targets": [
     "geo_diag/platform_check.py",
-    "scripts/product_convergence_gate.py"
+    "scripts/product_convergence_gate.py",
+    "scripts/transformers_bridge.py"
   ],
   "known_external_reference_files": [
-    "scripts/product_convergence_gate.py"
+    "SKILL.md",
+    "scripts/doctor.py",
+    "scripts/minddistill_api.py",
+    "scripts/product_convergence_gate.py",
+    "scripts/transformers_bridge.py",
+    "tests/test_transformers_bridge.py"
   ],
   "policy": "External/fusion references are allowed only when explicitly reviewed here; new fusion work must add a smoke target or entrypoint wiring."
 }
