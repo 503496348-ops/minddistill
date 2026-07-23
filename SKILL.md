@@ -40,14 +40,14 @@ version: "2.0"
 ### 1. 仅审计（诊断模式）
 
 ```bash
-python3 /root/.hermes/skills/minddistill/geo_diag/engine.py https://example.com
-python3 /root/.hermes/skills/minddistill/geo_diag/engine.py https://example.com --json -o report.json
+python3 geo_diag/engine.py https://example.com
+python3 geo_diag/engine.py https://example.com --json -o report.json
 ```
 
 ### 2. 审计 + 生成修复文件（闭环模式）
 
 ```bash
-python3 /root/.hermes/skills/minddistill/geo_diag/engine.py https://example.com \
+python3 geo_diag/engine.py https://example.com \
   --fix \
   --site-name "Your Site" \
   --site-desc "Your site description" \
@@ -64,7 +64,7 @@ python3 /root/.hermes/skills/minddistill/geo_diag/engine.py https://example.com 
 ### 3. 审计 + 修复 + 验证（完整闭环）
 
 ```bash
-python3 /root/.hermes/skills/minddistill/geo_diag/engine.py https://example.com \
+python3 geo_diag/engine.py https://example.com \
   --fix \
   --verify \
   --site-name "Your Site" \
@@ -75,7 +75,7 @@ python3 /root/.hermes/skills/minddistill/geo_diag/engine.py https://example.com 
 
 ```python
 import sys
-sys.path.insert(0, '/root/.hermes/skills/minddistill')
+sys.path.insert(0, '.')  # run from skill/repo root
 from geo_diag import run_geo_audit, format_report_text, generate_fixes_from_audit
 from geo_diag.engine import GeoAuditResult
 from geo_diag.fixer import GeoFixes
@@ -120,10 +120,10 @@ schema = generate_jsonld_schema("Example", "https://example.com", "Description")
 ### 场景1：客户SEO审计
 ```bash
 # 审计客户网站，生成诊断报告
-python3 engine.py https://client-site.com --json -o audit.json
+python3 geo_diag/engine.py https://client-site.com --json -o audit.json
 
 # 生成修复方案交付客户
-python3 engine.py https://client-site.com --fix --site-name "Client" --site-desc "..." --fix-dir ./client-fixes
+python3 geo_diag/engine.py https://client-site.com --fix --site-name "Client" --site-desc "..." --fix-dir ./client-fixes
 ```
 
 ### 场景2：竞品GEO对比
