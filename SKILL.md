@@ -29,6 +29,14 @@ version: "2.0"
 
 ## 核心能力
 
+## 快速开始
+
+```bash
+python3 geo_diag/engine.py --help
+python3 scripts/cli.py --help
+```
+
+
 | 能力 | 说明 |
 |------|------|
 | 🔍 **审计** | 8维度评分，发现问题 |
