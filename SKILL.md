@@ -5,25 +5,27 @@ license: MIT
 metadata:
   author: 503496348-ops
   version: "2.0"
-triggers:
-  - GEO审计
-  - GEO诊断
-  - AI搜索优化
-  - 可引用性评分
-  - geo audit
-  - ai search readiness
-  - 意识浓缩
-  - minddistill
-  - llms.txt
-  - robots.txt审计
-  - AI爬虫
-  - 网站SEO诊断
-  - GEO修复
-  - 生成robots.txt
-  - 生成llms.txt
 ---
 
 # GEO 诊断报告引擎
+
+## 触发条件
+
+- GEO审计
+- GEO诊断
+- AI搜索优化
+- 可引用性评分
+- geo audit
+- ai search readiness
+- 意识浓缩
+- minddistill
+- llms.txt
+- robots.txt审计
+- AI爬虫
+- 网站SEO诊断
+- GEO修复
+- 生成robots.txt
+- 生成llms.txt
 
 > 8维度AI搜索引擎就绪度审计 + 可引用性评分 + 平台优化检测 + **自动生成修复文件**
 
