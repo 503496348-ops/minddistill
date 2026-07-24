@@ -1,9 +1,10 @@
 ---
 name: minddistill
 description: "AI搜索引擎就绪度诊断引擎。8维度评分+可引用性检测+4平台(Google/Bing/Perplexity/ChatGPT)就绪度。当需要诊断网站SEO/GEO状态、优化AI搜索可见性时使用。"
-  意识浓缩 · Minddistill — AI搜索引擎就绪度诊断引擎。
-  8维度评分(robots.txt/llms.txt/Schema/Meta/可引用性/平台优化/品牌实体/技术SEO)。
-  AI可引用性评分 + 4平台就绪度检测 + 自动生成修复文件。
+license: MIT
+metadata:
+  author: 503496348-ops
+  version: "2.0"
 triggers:
   - GEO审计
   - GEO诊断
@@ -20,7 +21,6 @@ triggers:
   - GEO修复
   - 生成robots.txt
   - 生成llms.txt
-version: "2.0"
 ---
 
 # GEO 诊断报告引擎
