@@ -193,3 +193,13 @@ https://github.com/503496348-ops/minddistill
 ## 详细文档
 
 完整内容见 `references/full-skill.md`。
+
+## DNA Memory 融合（记忆价值度量+认知分型诊断）
+
+基于 [DNA Memory](https://github.com/AIPMAndy/dna-memory) 记忆价值度量系统增强：
+- 记忆价值指标（recall_attempts/hits/useful/misleading/recall_share）
+- 质量诊断维度（召回命中率/有用率/误导率/认知新鲜度）
+- 认知分型分布诊断（8种类型占比分析）
+- 健康度评分输出（A/B/C/D）
+
+详见 `references/dna-memory-value-metrics.md`
